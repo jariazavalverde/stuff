@@ -16,4 +16,4 @@ genCurry n = do
     return $ FunD name [Clause args (NormalB body) []]
 
 genCurries :: Int -> Q [Dec]
-genCurries = (mapM genCurry) . (enumFromTo 1)
+genCurries = (mapM genCurry) . (enumFromTo 0)
