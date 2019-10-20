@@ -1,0 +1,30 @@
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<script type="text/javascript" src="../src/plot.js"></script>
+	</head>
+	<body>
+		<canvas id="plot1" width="600" height="500"></canvas>
+		<script type="text/javascript">
+			var plot = new Plot({
+				canvas: plot1,
+				width: 600,
+				height: 500,
+				grid_size: 50,
+				unit_size: 50
+			});
+			plot.generate_uniform({tail: false, head_form:"circle"});
+			plot.refresh();
+			var rotate = new Matrix(2, 2, [
+				Math.cos(Math.PI/180), Math.cos(91*Math.PI/180),
+				Math.sin(Math.PI/180), Math.sin(91*Math.PI/180)]);
+			var scale = new Matrix(2, 2, [1, 0, 0, 1]).scalar(0.995);
+			var shear = new Matrix(2, 2, [1, 1, 0, 1]);
+			var rotate_and_scale = scale.product(rotate);
+			setInterval(function() {
+				plot.transform(rotate_and_scale);
+				plot.refresh();
+			}, 20);
+		</script>
+	</body>
+</html>
