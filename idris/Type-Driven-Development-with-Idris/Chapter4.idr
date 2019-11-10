@@ -1,3 +1,6 @@
+import Data.Vect
+import Data.Fin
+
 data Shape = ||| Triangle with length and height
              Triangle Double Double
            | ||| Rectangle with length and height
@@ -76,7 +79,7 @@ evaluate (Add expr expr1) = evaluate expr + evaluate expr1
 evaluate (Sub expr expr1) = evaluate expr - evaluate expr1
 evaluate (Mult expr expr1) = evaluate expr * evaluate expr1
 
---- Exercise 5
+-- Exercise 5
 ||| Write a function that returns the larger of the two inputs, or Nothing if
 ||| both inputs are Nothing.
 maxMaybe : Ord a => Maybe a -> Maybe a -> Maybe a
@@ -104,3 +107,60 @@ biggestTriangle : Picture -> Maybe Double
 biggestTriangle pic = (case allTriangles pic of
                             [] => Nothing
                             xs => Just $ foldr max 0 (map area xs))
+
+
+
+{- EXERCISES 4.2 -}
+
+-- Exercise 1
+||| Extend the Vehicle data type so that it supports unicycles and motorcycles,
+||| and update wheels and refuel accordingly.
+
+-- Exercise 2
+||| Extend the PowerSource and Vehicle data types to support electric vehicles
+||| (such as trams or electric cars).
+data PowerSource = Petrol | Pedal | Electricity
+data Vehicle : PowerSource -> Type where
+     Bicycle : Vehicle Pedal
+     Unicycle : Vehicle Pedal
+     Motorcycle: (fuel : Nat) -> Vehicle Petrol
+     Car : (fuel : Nat) -> Vehicle Petrol
+     Bus : (fuel : Nat) -> Vehicle Petrol
+     Tram : Vehicle Electricity
+     ElectricCar : Vehicle Electricity
+
+wheels : Vehicle power -> Nat
+wheels Bicycle = 2
+wheels Unicycle = 1
+wheels (Motorcycle fuel) = 2
+wheels (Car fuel) = 4
+wheels (Bus fuel) = 4
+wheels Tram = 0
+wheels ElectricCar = 4
+
+refuel : Vehicle Petrol -> Vehicle Petrol
+refuel (Motorcycle fuel) = Motorcycle 50
+refuel (Car fuel) = Car 100
+refuel (Bus fuel) = Bus 200
+
+-- Exercise 3
+||| The take function, on List, has type Nat -> List a -> List a . What’s an
+||| appropriate type for the corresponding vectTake function on Vect?
+-- vectTake : Fin n -> Vect (n+m) a -> Vect n a
+
+-- Exercise 4
+||| Implement vectTake.
+vectTake : (n : Nat) -> Vect (n+m) a -> Vect n a
+vectTake Z _ = []
+vectTake (S k) (x::xs) = x :: vectTake k xs
+
+-- Exercise 5
+||| Write a sumEntries function with the following type:
+||| sumEntries : Num a => (pos : Integer) -> Vect n a -> Vect n a -> Maybe a
+||| It should return the sum of the entries at position pos in each of the
+||| inputs if pos is within bounds, or Nothing otherwise
+sumEntries : Num a => (pos : Integer) -> Vect n a -> Vect n a -> Maybe a
+sumEntries {n} pos xs ys = let mf = integerToFin pos n in
+                               (case mf of
+                                     Nothing => Nothing
+                                     (Just f) => Just $ index f xs + index f ys)
