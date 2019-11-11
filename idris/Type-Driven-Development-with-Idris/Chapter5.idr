@@ -1,4 +1,5 @@
 import System
+import Data.Vect
 
 
 
@@ -82,3 +83,43 @@ replWith' state prompt onInput = do putStr prompt
                                           Nothing => pure ()
                                           (Just (result, state')) => do putStr result
                                                                         replWith' state' prompt onInput)
+
+
+
+{- EXERCISES 5.3 -}
+
+-- Exercise 1
+||| Write a function, readToBlank : IO (List String) , that reads input from the
+||| console until the user enters a blank line.
+readToBlank : IO (List String)
+readToBlank = do x <- getLine
+                 if x == "" then pure []
+                 else readToBlank >>= pure . (x::)
+
+-- Exercise 2
+||| Write a function, readAndSave : IO (), that reads input from the console
+||| until the user enters a blank line, and then reads a filename from the
+||| console and writes the input to that file.
+readAndSave : IO ()
+readAndSave = do input <- readToBlank
+                 filename <- getLine
+                 Right _ <- writeFile filename $ concat $ intersperse "\n" input
+                          | Left err => putStrLn (show err)
+                 pure ()
+
+readVectFile' : File -> IO (len ** Vect len String)
+readVectFile' h = if !(fEOF h) then pure (_ ** [])
+                  else do Right x <- fGetLine h | Left _ => pure (_ ** [])
+                          (_ ** xs) <- readVectFile' h
+                          pure (_ ** x::xs)
+
+-- Exercise 3
+||| Write a function that reads the contents of a file into a dependent pair
+||| containing a length and a Vect of that length. If there are any errors, it
+||| should return an empty vector.
+readVectFile : (filename : String) -> IO (n ** Vect n String)
+readVectFile filename = do Right h <- openFile filename Read
+                                   | Left err => pure (_ ** [])
+                           xs <- readVectFile' h
+                           closeFile h
+                           pure xs
