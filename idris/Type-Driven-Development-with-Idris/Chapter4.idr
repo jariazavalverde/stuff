@@ -160,7 +160,70 @@ vectTake (S k) (x::xs) = x :: vectTake k xs
 ||| It should return the sum of the entries at position pos in each of the
 ||| inputs if pos is within bounds, or Nothing otherwise
 sumEntries : Num a => (pos : Integer) -> Vect n a -> Vect n a -> Maybe a
-sumEntries {n} pos xs ys = let mf = integerToFin pos n in
-                               (case mf of
-                                     Nothing => Nothing
-                                     (Just f) => Just $ index f xs + index f ys)
+sumEntries {n} pos xs ys = (case integerToFin pos n of
+                                 Nothing => Nothing
+                                 (Just f) => Just $ index f xs + index f ys)
+
+
+
+{- EXERCISES 4.3 -}
+
+-- Exercise 1
+{- Add a size command that displays the number of entries in the store. -}
+
+-- Exercise 2
+{- Add a search command that displays all the entries in the store containing a
+given substring. -}
+
+-- Exercise 3
+{- Extend search to print the location of each result, as well as the string. -}
+
+data DataStore : Type where
+     MkData : (size : Nat) -> (items : Vect size String) -> DataStore
+
+data Command = DSAdd String
+             | DSGet Integer
+             | DSSize
+             | DSSearch String
+             | DSQuit
+
+size : DataStore -> Nat
+size (MkData size' items') = size'
+
+items : (store : DataStore) -> Vect (size store) String
+items (MkData size' items') = items'
+
+addToStore : DataStore -> String -> DataStore
+addToStore (MkData size items) newitem = MkData _ (items ++ [newitem])
+
+parse : (input : String) -> Maybe Command
+parse input = case Strings.span (/= ' ') input of
+                   ("add", str) => Just $ DSAdd (ltrim str)
+                   ("search", str) => Just $ DSSearch (ltrim str)
+                   ("get", id) => Just $ DSGet (cast (ltrim id))
+                   ("size", rest) => if ltrim rest == "" then Just DSSize else Nothing
+                   ("quit", rest) => if ltrim rest == "" then Just DSQuit else Nothing
+                   _ => Nothing
+
+getEntry : (id : Integer) -> (store : DataStore) -> Maybe (String, DataStore)
+getEntry id store = let entries = items store in
+                        (case integerToFin id (size store) of
+                              Nothing => Just ("Out of range\n", store)
+                              (Just id) => Just (Vect.index id entries ++ "\n", store))
+
+searchEntries : (item : String) -> (store : DataStore) -> String
+searchEntries item store = Foldable.concat $ map (\(id,str) => show id ++ " " ++ str ++ "\n") $
+                           List.filter ((isInfixOf item).snd) (List.zip [0..size store] (toList $ items store))
+
+
+processInput : DataStore -> String -> Maybe (String, DataStore)
+processInput store input = case parse input of
+                                Nothing => Just ("Invalid command\n", store)
+                                (Just DSSize) => Just (show (size store) ++ "\n", store)
+                                (Just (DSAdd item)) => Just ("ID " ++ show (size store) ++ "\n", addToStore store item)
+                                (Just (DSSearch item)) => Just (searchEntries item store, store)
+                                (Just (DSGet id)) => getEntry id store
+                                (Just DSQuit) => Nothing
+
+main : IO ()
+main = replWith (MkData _ []) "Command: " processInput
