@@ -23,3 +23,16 @@ data ThreeEq : a -> b -> c -> Type where
 ||| Implement the following function, which uses ThreeEq:
 allSameS : (x, y, z : Nat) -> ThreeEq x y z -> ThreeEq (S x) (S y) (S z)
 allSameS x x x (Same3 x) = Same3 (S x)
+
+
+
+{- EXERCISES 8.2 -}
+
+-- Exercise 1
+||| Using plusZeroRightNeutral and plusSuccRightSucc, write your own version of
+||| plusCommutes:
+myPlusCommutes : (n : Nat) -> (m : Nat) -> n + m = m + n
+myPlusCommutes Z m = rewrite plusZeroRightNeutral m in Refl
+myPlusCommutes (S k) m = let induction = myPlusCommutes k m in
+                         rewrite induction in
+                         rewrite plusSuccRightSucc m k in Refl
