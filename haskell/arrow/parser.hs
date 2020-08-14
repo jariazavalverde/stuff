@@ -3,7 +3,6 @@
 import Control.Category
 import Control.Arrow
 import Data.List(union)
-import Data.Char(isDigit)
 
 data StaticParser s = SP {
     getEmpty :: Bool,
@@ -69,9 +68,6 @@ liftA2 op f g = (f &&& g) >>^ \(b,c) -> b `op` c
 (>$>) :: Arrow a => a b (c -> d) -> a b c -> a b d
 (>$>) = liftA2 (\f x -> f x)
 
-empty :: b -> Parser s a b
-empty x = Parser (SP True []) (DP $ \(_,xs) -> Just (x,xs))
-
 opt :: Eq s => Parser s b c -> c -> Parser s b c 
 p `opt` x = p <+> empty x
 
@@ -79,6 +75,9 @@ some :: Eq s => Parser s a b -> Parser s a [b]
 some p = (liftA2 (:) p (some p `opt` []))
 
 -- | Basic parsers.
+
+empty :: b -> Parser s a b
+empty x = Parser (SP True []) (DP $ \(_,xs) -> Just (x,xs))
 
 symbol :: s -> Parser s a s
 symbol x = Parser (SP False [x]) (DP $ \(a,(_:xs)) -> Just (x,xs))
