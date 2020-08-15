@@ -48,13 +48,6 @@ instance Eq s => ArrowPlus (Parser s) where
                      if b2 then g (x,s) else
                      Nothing)
 
-instance Eq s => ArrowChoice (Parser s) where
-    left (Parser static (DP f)) = Parser static (DP $ \(x,s) -> case x of
-        Left a -> case f (a,s) of
-            Nothing -> Nothing
-            Just (a',s') -> Just (Left a',s')
-        Right b -> Just (Right b,s))
-
 runParser :: Eq s => Parser s a b -> [s] -> a -> Maybe (b,[s])
 runParser (Parser (SP b s) (DP f)) xs a = case xs of
     [] -> if b then f (a,xs) else Nothing
