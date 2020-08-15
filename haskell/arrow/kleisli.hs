@@ -20,6 +20,9 @@ instance Monad m => ArrowChoice (K m) where
         Left x -> fmap Left (f x) 
         Right x -> return (Right x)) 
 
+instance Monad m => ArrowApply (K m) where
+    app = K (\((K f),x) -> f x)
+
 -- | Combinators.
 
 liftA2 :: Arrow a => (b -> c -> d) -> a e b -> a e c -> a e d
