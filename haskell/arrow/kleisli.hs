@@ -21,7 +21,7 @@ instance Monad m => ArrowChoice (K m) where
         Right x -> return (Right x)) 
 
 instance Monad m => ArrowApply (K m) where
-    app = K (\((K f),x) -> f x)
+    app = K (\(K f,x) -> f x)
 
 -- | Combinators.
 

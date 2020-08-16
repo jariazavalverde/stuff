@@ -15,7 +15,14 @@ class Arrow(Category):
         """Send the first component of the input through the argument arrow,
         and copy the rest unchanged to the output.
         first :: Arrow b c -> Arrow (b, d) (c, d)"""
-        raise NotImplementedError
+        arrow = f.__class__
+        return f * arrow.id()
+
+    def second(f):
+        """A mirror image of first.
+        second :: Arrow b c -> Arrow (d, b) (d, c)"""
+        arrow = f.__class__
+        return arrow.id() * f
     
     @classmethod
     def returnA(arrow):
@@ -23,13 +30,6 @@ class Arrow(Category):
         returnA :: Arrow a a"""
         return arrow.arr(lambda x: x)
 
-    def second(f):
-        """A mirror image of first.
-        second :: Arrow b c -> Arrow (d, b) (d, c)"""
-        arrow = f.__class__
-        swap = arrow.arr(lambda xs: (xs[1],xs[0]))
-        return arrow.id().first() - swap - f.first() - swap
-    
     def __mul__(f, g):
         """Split the input between the two argument arrows and combine their
         output.
