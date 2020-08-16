@@ -6,14 +6,14 @@ class Applicative(Functor):
     expressions, and sequence computations and combine their results."""
 
     @staticmethod
-    def pure():
+    def pure(x):
         """Lift a value.
         pure :: a -> Applicative a"""
         raise NotImplementedError
     
-    def ap():
+    def ap(u, v):
         """Sequential application.
-        app :: Applicative (a -> b) -> Applicative a -> Applicative b"""
+        ap :: Applicative (a -> b) -> Applicative a -> Applicative b"""
         raise NotImplementedError
 
 def liftA2(f, a, b):
