@@ -5,15 +5,15 @@ class Functor:
     into an f b, preserving the structure of f."""
 
     def fmap(x, f):
-        """Functor a -> (a -> b) -> Functor b"""
+        """fmap :: Functor a -> (a -> b) -> Functor b"""
         raise NotImplementedError
     
     def replaceAll(x, c):
         """Replace all locations in the input with the same value.
-        Functor a -> b -> Functor b"""
+        replaceAll :: Functor a -> b -> Functor b"""
         return x.fmap(lambda _x: c)
 
     def void():
         """Discards or ignores the result of evaluation.
-        Functor a -> Functor ()"""
+        void :: Functor a -> Functor ()"""
         return x.replaceAll(())
